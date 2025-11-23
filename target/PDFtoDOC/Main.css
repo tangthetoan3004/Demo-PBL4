@@ -1,0 +1,425 @@
+/* Import Font Poppins cho đồng bộ với Login */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+    --primary-gradient: linear-gradient(to right, #a18cd1 0%, #fbc2eb 100%);
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.05);
+    --text-main: #444;
+    --text-light: #888;
+    --border-radius: 24px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #FFDEE9;
+    background-image: linear-gradient(0deg, #FFDEE9 0%, #B5FFFC 100%);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 40px; /* Để nội dung không sát đáy */
+}
+
+/* --- THANH MENU (Taskbar) --- */
+.taskbar {
+    width: 90%; /* Không full màn hình nhìn sẽ sang hơn */
+    max-width: 1200px;
+    margin-top: 20px;
+    background: var(--glass-bg);
+    padding: 15px 30px;
+    border-radius: 50px; /* Bo tròn như viên thuốc */
+    box-shadow: var(--shadow-soft);
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    backdrop-filter: blur(10px); /* Hiệu ứng kính mờ */
+}
+
+.taskbar__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Menu bên trái */
+.taskbar ol {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+}
+
+.taskbar ol li a, .taskbar ol li {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.taskbar ol li:hover, .taskbar ol li a:hover {
+    color: #a18cd1; /* Màu tím pastel */
+}
+
+/* Khu vực Account bên phải */
+.account {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 500;
+    background: #f0f4f8;
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 1px solid white; /* Viền trắng mỏng */
+}
+
+.account i {
+    color: #a18cd1;
+    font-size: 18px;
+}
+
+.account a {
+    color: #ff6b6b;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: opacity 0.3s;
+}
+
+.account a:hover {
+    opacity: 0.7;
+}
+
+/* --- PHẦN CONVERTER (Upload) --- */
+.Converter {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+h1 {
+    font-size: 32px;
+    margin-bottom: 25px;
+    color: #444;
+    font-weight: 700;
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+}
+
+.Converter_item {
+    width: 90%;
+    max-width: 800px;
+    background: white;
+    padding: 10px; /* Padding nhỏ để tạo viền trắng */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Vùng Dropzone/Upload */
+.Content {
+    background-color: #f8faff;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='24' ry='24' stroke='%23A18CD1FF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    border-radius: 20px; /* Bo tròn nhỏ hơn container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px;
+    gap: 25px;
+    transition: background-color 0.3s;
+    border: none; /* Bỏ border cũ */
+}
+
+.Content:hover {
+    background-color: #f0f4ff;
+}
+
+.Content i {
+    font-size: 80px;
+    color: #a18cd1; /* Icon màu tím */
+    margin-bottom: 10px;
+}
+
+/* Input file */
+input[type="file"] {
+    font-size: 16px;
+    color: var(--text-light);
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+/* Nút Convert */
+button, #convertButton {
+    margin-top: 10px;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    background: var(--primary-gradient);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover, #convertButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(161, 140, 209, 0.6);
+    background: var(--primary-gradient); /* Giữ nguyên gradient */
+    border: none;
+}
+
+button:disabled {
+    background: #ccc;
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* --- PHẦN LỊCH SỬ (History Table) --- */
+.History {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+table {
+    width: 90%;
+    max-width: 1000px;
+    border-collapse: separate; /* Để bo góc bảng */
+    border-spacing: 0;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden; /* Ẩn góc vuông */
+    box-shadow: var(--shadow-soft);
+    border: none; /* Bỏ border cũ */
+}
+
+/* Header bảng */
+thead tr {
+    background-color: #a18cd1; /* Header màu tím */
+    background: var(--primary-gradient);
+    color: white;
+}
+
+th {
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    text-align: center;
+}
+
+/* Body bảng */
+td {
+    padding: 18px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0; /* Viền mờ giữa các dòng */
+    color: #555;
+    font-size: 15px;
+    border-right: none; /* Bỏ viền dọc */
+}
+
+/* Dòng cuối không gạch chân */
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hiệu ứng hover dòng */
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Icon trạng thái và download */
+td i {
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+td .fa-download {
+    color: #2ecc71; /* Xanh lá */
+    background: #eafff2;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+td .fa-download:hover {
+    transform: scale(1.2);
+    background: #d4ffe4;
+}
+
+td .fa-circle-xmark {
+    color: #ff6b6b;
+    background: #ffe5e5;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+/* Hiệu ứng xuất hiện */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- PHẦN CSS CHO KHUNG XEM TRƯỚC (MODAL) --- */
+/* Lớp nền mờ che phủ toàn màn hình */
+.modal {
+    display: none; /* Mặc định ẩn đi */
+    position: fixed; 
+    z-index: 9999; /* Đảm bảo nó nằm trên cùng */
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.6); /* Màu đen mờ */
+    backdrop-filter: blur(5px); /* Hiệu ứng làm mờ nền sau */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cái hộp nội dung chính giữa */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto; /* Căn giữa */
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%; /* Chiếm 80% chiều rộng */
+    max-width: 900px;
+    height: 85%; /* Chiếm 85% chiều cao */
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalShow 0.3s ease-out; /* Hiệu ứng hiện ra */
+}
+
+@keyframes modalShow {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Thanh tiêu đề của Modal */
+.modal-header {
+    padding: 20px 30px;
+    background: linear-gradient(to right, #a18cd1 0%, #fbc2eb 100%); /* Màu tím hồng */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Nút đóng (X) */
+.close {
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #ff6b6b;
+}
+
+/* Phần nội dung văn bản */
+.modal-body {
+    padding: 40px;
+    overflow-y: auto; /* Cho phép cuộn dọc */
+    flex: 1;
+    font-family: 'Times New Roman', serif; /* Font giống Word cho dễ đọc */
+    line-height: 1.6;
+    color: #333;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+/* Style cho loading */
+.loading-spinner {
+    font-size: 18px;
+    color: #666;
+    text-align: center;
+    margin-top: 100px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* --- CUSTOM FILE UPLOAD STYLE --- */
+
+/* 1. Ẩn nút mặc định xấu xí đi */
+input[type="file"] {
+    display: none;
+}
+
+/* 2. Trang trí cái nhãn (Label) thành nút bấm đẹp */
+.custom-file-upload {
+    display: inline-block;
+    padding: 12px 30px;
+    cursor: pointer;
+    border: 2px dashed #a18cd1; /* Viền nét đứt màu tím */
+    border-radius: 50px;
+    background-color: white;
+    color: #a18cd1;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Hiệu ứng khi di chuột vào */
+.custom-file-upload:hover {
+    background-color: #a18cd1;
+    color: white;
+    border-color: transparent; /* Mất viền đứt, thành nền đặc */
+    box-shadow: 0 8px 20px rgba(161, 140, 209, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Icon bên trong nút */
+.custom-file-upload i {
+    margin-right: 8px;
+    font-size: 16px;
+    color: inherit; /* Icon đổi màu theo chữ */
+}
+
+/* Chỉnh lại icon đám mây to ở trên */
+.Content i.fa-cloud-arrow-up {
+    font-size: 60px;
+    color: #a18cd1;
+    margin-bottom: 10px;
+    background: white;
+    padding: 20px;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(161, 140, 209, 0.2);
+}

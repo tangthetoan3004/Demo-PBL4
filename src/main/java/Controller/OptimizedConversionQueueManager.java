@@ -131,10 +131,11 @@ public class OptimizedConversionQueueManager {
         public void run() {
             System.out.println("[WORKER " + workerId + "] Đã sẵn sàng xử lý task từ priority queue");
             while (!Thread.currentThread().isInterrupted()) {
+                ConversionTaskRunnable task = null;
                 try {
                     // Lấy task từ priority queue (file nhỏ nhất trước)
                     PriorityConversionTask priorityTask = taskQueue.take();
-                    ConversionTaskRunnable task = priorityTask.getTask();
+                    task = priorityTask.getTask();
                     
                     System.out.println("[WORKER " + workerId + "] Đang xử lý: " + priorityTask + 
                         " (đã chờ " + priorityTask.getWaitingTime() + "ms) | Queue còn lại: " + taskQueue.size());
@@ -157,33 +158,66 @@ public class OptimizedConversionQueueManager {
                 } catch (Exception e) {
                     System.err.println("[WORKER " + workerId + "] Lỗi: " + e.getMessage());
                     e.printStackTrace();
+                    
+                    // FIX: Đảm bảo update status nếu có exception xảy ra
+                    // (trường hợp executeWithRetry throw exception trước khi vào retry loop)
+                    if (task != null) {
+                        try {
+                            int inforID = task.getInforID();
+                            if (inforID > 0) {
+                                // Nếu đã có entry trong DB, update status = Failed
+                                task.updateStatus("Failed");
+                                System.err.println("[WORKER " + workerId + "] Đã update status Failed cho task ID: " + inforID);
+                            }
+                        } catch (Exception updateEx) {
+                            System.err.println("[WORKER " + workerId + "] Không thể update status: " + updateEx.getMessage());
+                        }
+                    }
                 }
             }
         }
         
         /**
          * Thực thi task với retry mechanism (exponential backoff)
+         * FIX: Chỉ save database 1 lần, không tạo duplicate entries khi retry
          */
         private boolean executeWithRetry(ConversionTaskRunnable task, int maxRetries) {
+            // FIX: Save database entry TRƯỚC retry loop (chỉ 1 lần)
+            int inforID = task.saveToDatabase();
+            if (inforID <= 0) {
+                System.err.println("[WORKER " + workerId + "] Không thể lưu thông tin vào database");
+                return false;
+            }
+
+            // Retry loop: chỉ thực hiện conversion, không save database nữa
             for (int attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
-                    task.run();
+                    // Chỉ thực hiện conversion, không gọi task.run() (vì run() sẽ save DB lại)
+                    task.executeConversion();
+                    
+                    // Conversion thành công
+                    task.updateStatus("Success");
+                    task.cleanupOnSuccess();
                     return true; // Success
+                    
                 } catch (Exception e) {
                     if (attempt < maxRetries) {
                         // Exponential backoff: 1s, 2s, 4s
                         long backoffTime = (long) Math.pow(2, attempt - 1) * 1000;
                         System.out.println("[WORKER " + workerId + "] Retry attempt " + 
-                            attempt + "/" + maxRetries + " sau " + backoffTime + "ms");
+                            attempt + "/" + maxRetries + " sau " + backoffTime + "ms | Error: " + e.getMessage());
                         try {
                             Thread.sleep(backoffTime);
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
+                            task.updateStatus("Failed");
                             return false;
                         }
                     } else {
-                        System.err.println("[WORKER " + workerId + "] Đã hết số lần retry");
+                        // Đã hết số lần retry
+                        System.err.println("[WORKER " + workerId + "] Đã hết số lần retry cho task ID: " + inforID);
                         e.printStackTrace();
+                        task.updateStatus("Failed");
                     }
                 }
             }

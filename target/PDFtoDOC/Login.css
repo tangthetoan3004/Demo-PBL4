@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+body {
+    width: 100vw; height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+    /* MÀU NỀN PASTEL HỒNG */
+    background-color: #FFDEE9;
+    background-image: linear-gradient(0deg, #FFDEE9 0%, #B5FFFC 100%);
+}
+
+.box {
+    width: 900px; height: 550px;
+    display: flex;
+    background: #ffffff;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+form {
+    flex: 1.5; display: flex; flex-direction: column;
+    justify-content: center; padding: 0 50px; background-color: #fff;
+}
+
+form h1 { font-size: 32px; color: #333; margin-bottom: 10px; }
+label { font-size: 14px; color: #888; margin-bottom: 5px; margin-top: 15px; }
+
+input[type="text"], input[type="password"] {
+    width: 100%; padding: 15px 20px;
+    background-color: #f0f4f8; border: none;
+    border-radius: 50px; outline: none; font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    background-color: #eef2f7;
+    box-shadow: 0 0 0 3px rgba(181, 255, 252, 0.6);
+}
+
+.button { margin-top: 30px; display: flex; gap: 15px; }
+
+input[type="submit"], input[type="reset"] {
+    padding: 12px 30px; border: none; border-radius: 50px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+/* MÀU NÚT PASTEL TÍM */
+input[type="submit"] {
+    background: linear-gradient(to right, #a18cd1 0%, #fbc2eb 100%);
+    color: white;
+    box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
+}
+
+input[type="reset"] { background-color: #fff; color: #888; border: 2px solid #eee; }
+input[type="submit"]:hover { transform: translateY(-2px); }
+
+/* PHẦN BÊN PHẢI MÀU TÍM */
+.content {
+    flex: 1;
+    background: linear-gradient(to bottom right, #a18cd1 0%, #fbc2eb 100%);
+    color: white; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 40px; position: relative;
+}
+
+.content h1 { font-size: 36px; font-weight: 700; margin-bottom: 15px; }
+.content p { font-size: 16px; margin-bottom: 30px; opacity: 0.9; }
+.content button {
+    padding: 12px 30px; background: transparent; border: 2px solid white;
+    color: white; border-radius: 50px; font-weight: 600; cursor: pointer;
+}
+.content button:hover { background: white; color: #a18cd1; }

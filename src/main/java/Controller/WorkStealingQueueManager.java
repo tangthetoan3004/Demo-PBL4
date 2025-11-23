@@ -113,8 +113,9 @@ public class WorkStealingQueueManager {
 
             threadTaskCount.computeIfAbsent(threadId, k -> new AtomicInteger(0)).incrementAndGet();
 
+            ConversionTaskRunnable task = null;
             try {
-                ConversionTaskRunnable task = priorityTask.getTask();
+                task = priorityTask.getTask();
 
                 System.out.println("[WORK STEALING] Thread " + threadId +
                         " đang xử lý: " + priorityTask +
@@ -137,6 +138,21 @@ public class WorkStealingQueueManager {
                 System.err.println("[WORK STEALING] Thread " + threadId + " lỗi: " + e.getMessage());
                 e.printStackTrace();
                 monitor.recordTaskComplete(false, 0);
+                
+                // FIX: Đảm bảo update status nếu có exception xảy ra
+                // (trường hợp executeWithRetry throw exception trước khi vào retry loop)
+                if (task != null) {
+                    try {
+                        int inforID = task.getInforID();
+                        if (inforID > 0) {
+                            // Nếu đã có entry trong DB, update status = Failed
+                            task.updateStatus("Failed");
+                            System.err.println("[WORK STEALING] Đã update status Failed cho task ID: " + inforID);
+                        }
+                    } catch (Exception updateEx) {
+                        System.err.println("[WORK STEALING] Không thể update status: " + updateEx.getMessage());
+                    }
+                }
             } finally {
                 // Giảm task count
                 AtomicInteger count = threadTaskCount.get(threadId);
@@ -157,25 +173,46 @@ public class WorkStealingQueueManager {
             }
         }
 
+        /**
+         * Thực thi task với retry mechanism
+         * FIX: Chỉ save database 1 lần, không tạo duplicate entries khi retry
+         */
         private boolean executeWithRetry(ConversionTaskRunnable task, int maxRetries) {
+            // FIX: Save database entry TRƯỚC retry loop (chỉ 1 lần)
+            int inforID = task.saveToDatabase();
+            if (inforID <= 0) {
+                System.err.println("[WORK STEALING] Không thể lưu thông tin vào database");
+                return false;
+            }
+
+            // Retry loop: chỉ thực hiện conversion, không save database nữa
             for (int attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
-                    task.run();
+                    // Chỉ thực hiện conversion, không gọi task.run() (vì run() sẽ save DB lại)
+                    task.executeConversion();
+                    
+                    // Conversion thành công
+                    task.updateStatus("Success");
+                    task.cleanupOnSuccess();
                     return true;
+                    
                 } catch (Exception e) {
                     if (attempt < maxRetries) {
                         long backoffTime = (long) Math.pow(2, attempt - 1) * 1000;
                         System.out.println("[WORK STEALING] Retry " + attempt + "/" + maxRetries +
-                                " sau " + backoffTime + "ms");
+                                " sau " + backoffTime + "ms | Error: " + e.getMessage());
                         try {
                             Thread.sleep(backoffTime);
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
+                            task.updateStatus("Failed");
                             return false;
                         }
                     } else {
-                        System.err.println("[WORK STEALING] Đã hết số lần retry");
+                        // Đã hết số lần retry
+                        System.err.println("[WORK STEALING] Đã hết số lần retry cho task ID: " + inforID);
                         e.printStackTrace();
+                        task.updateStatus("Failed");
                     }
                 }
             }
