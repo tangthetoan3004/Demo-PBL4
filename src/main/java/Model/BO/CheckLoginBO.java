@@ -9,14 +9,13 @@ public class CheckLoginBO {
 
     public int getUserId(String username, String plainPassword) {
         users userFromDB = checkLoginDAO.getUserForLogin(username);
-        
-        if (userFromDB == null) return -1;
-        
-        // CHECK HASH
+
+        if (userFromDB == null)
+            return -1;
+
         if (BCrypt.checkpw(plainPassword, userFromDB.getPassword())) {
             return userFromDB.getId();
         }
         return -1;
     }
 }
-

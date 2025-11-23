@@ -6,7 +6,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpSession;
 import Model.BO.CheckLoginBO;
 
@@ -14,33 +13,37 @@ import Model.BO.CheckLoginBO;
 public class CheckLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private CheckLoginBO checkLoginBO;
-    
+
     @Override
     public void init() throws ServletException {
         checkLoginBO = new CheckLoginBO();
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String username = request.getParameter("Username");
         String password = request.getParameter("Password");
-        String destination;
 
         try {
             int userId = checkLoginBO.getUserId(username, password);
             if (userId != -1) {
+                // Tạo session và set attributes
                 HttpSession session = request.getSession();
                 session.setAttribute("UserID", userId);
                 session.setAttribute("Username", username);
-                destination = "/Main.jsp";
+                session.setMaxInactiveInterval(30 * 60); // 30 phút
+
+                // Dùng forward để chuyển đến Main.jsp
+                request.getRequestDispatcher("Main.jsp").forward(request, response);
             } else {
+                // Lưu error message vào request attribute để hiển thị
                 request.setAttribute("errorMessage", "Sai tên đăng nhập hoặc mật khẩu.");
-                destination = "/Login.jsp";
+                request.getRequestDispatcher("Login.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            destination = "/Login.jsp";
+            request.setAttribute("errorMessage", "Đã xảy ra lỗi. Vui lòng thử lại.");
+            request.getRequestDispatcher("Login.jsp").forward(request, response);
         }
-        RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
-        rd.forward(request, response);
     }
 }
